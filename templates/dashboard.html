@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1>🚀 My Cloud Storage</h1>
+        <p>Upload, manage, and share your files securely</p>
+    </div>
+
+    <div class="upload-section">
+        <form method="POST" action="{{ url_for('upload_file') }}" enctype="multipart/form-data" id="uploadForm">
+            <div class="upload-area" id="uploadArea">
+                <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                <p class="upload-text">
+                    <span class="upload-text-main">✨ Click or Drag & Drop ✨</span><br>
+                    Your files or folders here
+                </p>
+                <p class="upload-info">
+                    📁 Folders supported • 💾 Max 100MB per file • 🎨 All file types welcome
+                </p>
+                <input type="file" name="file" id="mainFileInput" multiple style="display: none;">
+            </div>
+            <div class="upload-options">
+                <button type="button" class="btn btn-primary" id="selectFilesBtn">
+                    📄 Select Files
+                </button>
+                <button type="button" class="btn btn-primary" id="selectFolderBtn">
+                    📁 Select Folder
+                </button>
+                <button type="submit" class="btn btn-primary" id="uploadBtn">
+                    🚀 Upload
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="files-section">
+        <div class="files-header">
+            <h2>📦 Your Files ({{ files|length }})</h2>
+        </div>
+
+        {% if files %}
+            <div class="files-grid">
+                {% for file in files %}
+                    <div class="file-card">
+                        <div class="file-icon">
+                            {% if file.type == 'folder' %}📁{% else %}📄{% endif %}
+                        </div>
+                        <div class="file-info">
+                            <h3 class="file-name" title="{{ file.name }}">
+                                {{ file.name }}
+                            </h3>
+                            <p class="file-meta">
+                                {{ file.size_formatted }} • {{ file.modified }}
+                            </p>
+                        </div>
+                        <div class="file-actions">
+                            {% if file.type == 'file' %}
+                                <a href="{{ url_for('download_file', filename=file.path if file.path else file.name) }}" 
+                                   class="btn btn-small btn-download" title="Download">⬇️</a>
+                            {% endif %}
+                            <form method="POST" action="{{ url_for('delete_file', filename=file.path if file.path else file.name) }}" 
+                                  style="display: inline;" onsubmit="return confirm('Delete {{ file.name }}?');">
+                                <button type="submit" class="btn btn-small btn-delete" title="Delete">🗑️</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <h3>🌟 Your cloud is empty!</h3>
+                <p>Start by uploading your first file or folder</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const uploadArea = document.getElementById('uploadArea');
+        const selectFilesBtn = document.getElementById('selectFilesBtn');
+        const selectFolderBtn = document.getElementById('selectFolderBtn');
+        const uploadForm = document.getElementById('uploadForm');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const mainFileInput = document.getElementById('mainFileInput');
+
+        console.log('✅ Upload page initialized');
+        console.log('selectFilesBtn:', selectFilesBtn);
+        console.log('selectFolderBtn:', selectFolderBtn);
+        console.log('mainFileInput:', mainFileInput);
+
+        // Select Files button - for multiple files
+        selectFilesBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log('📄 Select Files clicked');
+            
+            // Remove folder attributes
+            mainFileInput.removeAttribute('webkitdirectory');
+            mainFileInput.removeAttribute('directory');
+            mainFileInput.setAttribute('multiple', 'multiple');
+            mainFileInput.click();
+        });
+
+        // Select Folder button - for folder upload
+        selectFolderBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log('📁 Select Folder clicked');
+            
+            // Add folder attributes
+            mainFileInput.setAttribute('webkitdirectory', 'webkitdirectory');
+            mainFileInput.setAttribute('directory', 'directory');
+            mainFileInput.setAttribute('multiple', 'multiple');
+            mainFileInput.click();
+        });
+
+        // Click on upload area
+        uploadArea.addEventListener('click', (e) => {
+            if (!e.target.closest('button')) {
+                console.log('Upload area clicked');
+                mainFileInput.removeAttribute('webkitdirectory');
+                mainFileInput.removeAttribute('directory');
+                mainFileInput.setAttribute('multiple', 'multiple');
+                mainFileInput.click();
+            }
+        });
+
+        // File selection handler
+        mainFileInput.addEventListener('change', () => {
+            const fileCount = mainFileInput.files.length;
+            if (fileCount > 0) {
+                const text = fileCount === 1 ? '1 file' : fileCount + ' files';
+                uploadArea.querySelector('.upload-text-main').textContent = '✨ ' + text + ' selected ✨';
+                uploadBtn.textContent = '🚀 Upload ' + text;
+                uploadBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                
+                console.log('📂 Selected ' + fileCount + ' files');
+                for (let i = 0; i < Math.min(fileCount, 3); i++) {
+                    console.log('   - ' + mainFileInput.files[i].name);
+                }
+            }
+        });
+
+        // Form submission
+        uploadForm.addEventListener('submit', (e) => {
+            if (mainFileInput.files.length === 0) {
+                e.preventDefault();
+                alert('⚠️ Please select files or a folder to upload!');
+                return false;
+            }
+            
+            console.log('🚀 Starting upload of ' + mainFileInput.files.length + ' files');
+            uploadBtn.textContent = '⏳ Uploading...';
+            uploadBtn.disabled = true;
+        });
+
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadArea.classList.add('drag-over');
+            console.log('Drag over upload area');
+        });
+
+        uploadArea.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadArea.classList.remove('drag-over');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadArea.classList.remove('drag-over');
+            
+            console.log('Files dropped:', e.dataTransfer.files.length);
+            mainFileInput.files = e.dataTransfer.files;
+            
+            // Trigger change event manually
+            const event = new Event('change', { bubbles: true });
+            mainFileInput.dispatchEvent(event);
+        });
+    });
+</script>
+
+{% endblock %}

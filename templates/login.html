@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Secure File Hosting{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <svg class="auth-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <h1>🎉 Welcome Back!</h1>
+            <p>Login to access your awesome cloud storage</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('login') }}" class="auth-form">
+            <div class="form-group">
+                <label for="username">✨ Username</label>
+                <input type="text" id="username" name="username" required 
+                       placeholder="Enter your username" autofocus>
+            </div>
+
+            <div class="form-group">
+                <label for="password">🔐 Password</label>
+                <input type="password" id="password" name="password" required 
+                       placeholder="Enter your password">
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">
+                🚀 Let's Go!
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            <p>New here? <a href="{{ url_for('register') }}">🌟 Create an account</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

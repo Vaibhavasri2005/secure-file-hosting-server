@@ -1,0 +1,14 @@
+[Unit]
+Description=Gunicorn instance to serve Secure File Hosting application
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/secure-file-hosting
+Environment="PATH=/var/www/secure-file-hosting/venv/bin"
+Environment="FLASK_ENV=production"
+ExecStart=/var/www/secure-file-hosting/venv/bin/gunicorn --workers 4 --bind 127.0.0.1:5000 --timeout 120 --access-logfile /var/log/gunicorn/access.log --error-logfile /var/log/gunicorn/error.log app:app
+
+[Install]
+WantedBy=multi-user.target
