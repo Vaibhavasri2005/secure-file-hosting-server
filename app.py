@@ -221,5 +221,8 @@ if __name__ == '__main__':
     if not os.path.exists(app.config['UPLOAD_FOLDER']):
         os.makedirs(app.config['UPLOAD_FOLDER'])
     
+    # Get port from environment variable for Railway deployment
+    port = int(os.environ.get('PORT', 5000))
+    
     # Run the application
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=port, debug=True)

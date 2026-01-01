@@ -1,7 +1,11 @@
-import sys
-sys.path.insert(0, '/var/www/secure-file-hosting')
+import os
+from app import app
 
-from app import app as application
+# Ensure upload folder exists
+upload_folder = os.environ.get('UPLOAD_FOLDER', 'uploads')
+if not os.path.exists(upload_folder):
+    os.makedirs(upload_folder)
 
 if __name__ == "__main__":
-    application.run()
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
