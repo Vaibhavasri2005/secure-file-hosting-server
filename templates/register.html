@@ -6,45 +6,113 @@
 <div class="auth-container">
     <div class="auth-card">
         <div class="auth-header">
-            <svg class="auth-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                <circle cx="8.5" cy="7" r="4"></circle>
-                <line x1="20" y1="8" x2="20" y2="14"></line>
-                <line x1="23" y1="11" x2="17" y2="11"></line>
-            </svg>
-            <h1>🎊 Join Us!</h1>
-            <p>Create your account and start storing files</p>
+            <div class="auth-icon-wrapper">
+                <svg class="auth-icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="8.5" cy="7" r="4"></circle>
+                    <line x1="20" y1="8" x2="20" y2="14"></line>
+                    <line x1="23" y1="11" x2="17" y2="11"></line>
+                </svg>
+            </div>
+            <h1>Create Account</h1>
+            <p>Sign up to get started</p>
         </div>
 
         <form method="POST" action="{{ url_for('register') }}" class="auth-form">
             <div class="form-group">
-                <label for="username">✨ Username</label>
+                <label for="username">Username</label>
                 <input type="text" id="username" name="username" required 
-                       placeholder="Choose a cool username" minlength="3" autofocus>
+                       placeholder="Choose a username" minlength="3" autofocus>
                 <small>At least 3 characters</small>
             </div>
 
             <div class="form-group">
-                <label for="password">🔐 Password</label>
+                <label for="password">Password</label>
                 <input type="password" id="password" name="password" required 
-                       placeholder="Create a strong password" minlength="6">
+                       placeholder="Create a password" minlength="6">
                 <small>At least 6 characters</small>
             </div>
 
             <div class="form-group">
-                <label for="confirm_password">🔒 Confirm Password</label>
+                <label for="confirm_password">Confirm Password</label>
                 <input type="password" id="confirm_password" name="confirm_password" required 
                        placeholder="Confirm your password">
             </div>
 
             <button type="submit" class="btn btn-primary btn-block">
-                🚀 Create Account
+                Create Account
             </button>
         </form>
 
         <div class="auth-footer">
-            <p>Already have an account? <a href="{{ url_for('login') }}">🎯 Login here</a></p>
+            <p>Already have an account? <a href="{{ url_for('login') }}">Sign in</a></p>
         </div>
     </div>
 </div>
+
+<style>
+    .auth-icon-wrapper {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 56px;
+        height: 56px;
+        background: linear-gradient(135deg, #16a34a, #15803d);
+        border-radius: 12px;
+        margin: 0 auto 1.5rem;
+    }
+    
+    .auth-icon-small {
+        width: 28px;
+        height: 28px;
+        color: white;
+    }
+    
+    .auth-header h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+    
+    .auth-header p {
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+    }
+    
+    .form-group label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-group input {
+        padding: 0.875rem 1rem;
+        font-size: 0.95rem;
+        border: 1.5px solid var(--border-color);
+        transition: all 0.2s;
+    }
+    
+    .form-group input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    
+    .form-group small {
+        font-size: 0.8rem;
+    }
+    
+    .btn-primary {
+        padding: 0.875rem;
+        font-size: 1rem;
+        font-weight: 600;
+        margin-top: 0.5rem;
+    }
+    
+    .auth-footer {
+        margin-top: 1.5rem;
+        font-size: 0.9rem;
+    }
+</style>
 {% endblock %}

@@ -5,7 +5,7 @@
 {% block content %}
 <div class="dashboard">
     <div class="dashboard-header">
-        <h1>🚀 My Cloud Storage</h1>
+        <h1>� My Cloud Storage</h1>
         <p>Upload, manage, and share your files securely</p>
     </div>
 
@@ -18,7 +18,7 @@
                     <line x1="12" y1="3" x2="12" y2="15"></line>
                 </svg>
                 <p class="upload-text">
-                    <span class="upload-text-main">✨ Click or Drag & Drop ✨</span><br>
+                    <span class="upload-text-main">Click or Drag & Drop</span><br>
                     Your files or folders here
                 </p>
                 <p class="upload-info">
@@ -40,15 +40,23 @@
         </form>
     </div>
 
-    <div class="files-section">
+    <!-- File Tabs -->
+    <div class="tabs">
+        <button class="tab active" data-tab="all">All Files ({{ files|length }})</button>
+        <button class="tab" data-tab="starred">⭐ Starred</button>
+        <button class="tab" data-tab="recent">🕒 Recent</button>
+    </div>
+
+    <!-- All Files Section -->
+    <div class="files-section" id="all-files">
         <div class="files-header">
-            <h2>📦 Your Files ({{ files|length }})</h2>
+            <h2>📦 All Files</h2>
         </div>
 
         {% if files %}
             <div class="files-grid">
                 {% for file in files %}
-                    <div class="file-card">
+                    <div class="file-card" data-file="{{ file.name }}">
                         <div class="file-icon">
                             {% if file.type == 'folder' %}📁{% else %}📄{% endif %}
                         </div>
@@ -61,21 +69,34 @@
                             </p>
                         </div>
                         <div class="file-actions">
+                            <button class="star-btn" onclick="toggleStar('{{ file.name }}')" title="Star">⭐</button>
                             {% if file.type == 'file' %}
                                 <a href="{{ url_for('download_file', filename=file.path if file.path else file.name) }}" 
                                    class="btn btn-small btn-download" title="Download">⬇️</a>
                             {% endif %}
-                            <form method="POST" action="{{ url_for('delete_file', filename=file.path if file.path else file.name) }}" 
-                                  style="display: inline;" onsubmit="return confirm('Delete {{ file.name }}?');">
-                                <button type="submit" class="btn btn-small btn-delete" title="Delete">🗑️</button>
-                            </form>
+                            <div class="dropdown">
+                                <button class="dropdown-toggle" onclick="toggleDropdown(this)">⋮</button>
+                                <div class="dropdown-menu">
+                                    {% if file.type == 'file' %}
+                                        <a href="{{ url_for('download_file', filename=file.path if file.path else file.name) }}" 
+                                           class="dropdown-item">📖 Open</a>
+                                        <a href="#" class="dropdown-item" onclick="shareFile('{{ file.name }}'); return false;">🔗 Share</a>
+                                    {% endif %}
+                                    <a href="#" class="dropdown-item">✏️ Rename</a>
+                                    <div class="dropdown-divider"></div>
+                                    <form method="POST" action="{{ url_for('delete_file', filename=file.path if file.path else file.name) }}" 
+                                          style="display: inline;" onsubmit="return confirm('Delete {{ file.name }}?');">
+                                        <button type="submit" class="dropdown-item" style="width: 100%; text-align: left; background: none; border: none; cursor: pointer; color: var(--error-color);">🗑️ Delete</button>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 {% endfor %}
             </div>
         {% else %}
             <div class="empty-state">
-                <h3>🌟 Your cloud is empty!</h3>
+                <h3>📂 Your cloud is empty!</h3>
                 <p>Start by uploading your first file or folder</p>
             </div>
         {% endif %}
@@ -92,16 +113,12 @@
         const mainFileInput = document.getElementById('mainFileInput');
 
         console.log('✅ Upload page initialized');
-        console.log('selectFilesBtn:', selectFilesBtn);
-        console.log('selectFolderBtn:', selectFolderBtn);
-        console.log('mainFileInput:', mainFileInput);
 
         // Select Files button - for multiple files
         selectFilesBtn.addEventListener('click', (e) => {
             e.preventDefault();
             console.log('📄 Select Files clicked');
             
-            // Remove folder attributes
             mainFileInput.removeAttribute('webkitdirectory');
             mainFileInput.removeAttribute('directory');
             mainFileInput.setAttribute('multiple', 'multiple');
@@ -113,7 +130,6 @@
             e.preventDefault();
             console.log('📁 Select Folder clicked');
             
-            // Add folder attributes
             mainFileInput.setAttribute('webkitdirectory', 'webkitdirectory');
             mainFileInput.setAttribute('directory', 'directory');
             mainFileInput.setAttribute('multiple', 'multiple');
@@ -123,7 +139,6 @@
         // Click on upload area
         uploadArea.addEventListener('click', (e) => {
             if (!e.target.closest('button')) {
-                console.log('Upload area clicked');
                 mainFileInput.removeAttribute('webkitdirectory');
                 mainFileInput.removeAttribute('directory');
                 mainFileInput.setAttribute('multiple', 'multiple');
@@ -136,14 +151,10 @@
             const fileCount = mainFileInput.files.length;
             if (fileCount > 0) {
                 const text = fileCount === 1 ? '1 file' : fileCount + ' files';
-                uploadArea.querySelector('.upload-text-main').textContent = '✨ ' + text + ' selected ✨';
+                uploadArea.querySelector('.upload-text-main').textContent = text + ' selected';
                 uploadBtn.textContent = '🚀 Upload ' + text;
-                uploadBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
                 
                 console.log('📂 Selected ' + fileCount + ' files');
-                for (let i = 0; i < Math.min(fileCount, 3); i++) {
-                    console.log('   - ' + mainFileInput.files[i].name);
-                }
             }
         });
 
@@ -155,7 +166,7 @@
                 return false;
             }
             
-            console.log('🚀 Starting upload of ' + mainFileInput.files.length + ' files');
+            console.log('🚀 Starting upload');
             uploadBtn.textContent = '⏳ Uploading...';
             uploadBtn.disabled = true;
         });
@@ -165,7 +176,6 @@
             e.preventDefault();
             e.stopPropagation();
             uploadArea.classList.add('drag-over');
-            console.log('Drag over upload area');
         });
 
         uploadArea.addEventListener('dragleave', (e) => {
@@ -179,14 +189,101 @@
             e.stopPropagation();
             uploadArea.classList.remove('drag-over');
             
-            console.log('Files dropped:', e.dataTransfer.files.length);
             mainFileInput.files = e.dataTransfer.files;
-            
-            // Trigger change event manually
             const event = new Event('change', { bubbles: true });
             mainFileInput.dispatchEvent(event);
         });
+
+        // Tab switching
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                const tabName = tab.dataset.tab;
+                filterFiles(tabName);
+            });
+        });
+
+        function filterFiles(filter) {
+            const fileCards = document.querySelectorAll('.file-card');
+            fileCards.forEach(card => {
+                if (filter === 'all') {
+                    card.style.display = 'flex';
+                } else if (filter === 'starred') {
+                    const starBtn = card.querySelector('.star-btn');
+                    card.style.display = starBtn && starBtn.classList.contains('starred') ? 'flex' : 'none';
+                } else if (filter === 'recent') {
+                    // Show all for now (can implement recent tracking)
+                    card.style.display = 'flex';
+                }
+            });
+        }
     });
+
+    // Toggle dropdown menu
+    function toggleDropdown(button) {
+        const dropdown = button.closest('.dropdown');
+        dropdown.classList.toggle('active');
+        
+        // Close when clicking outside
+        document.addEventListener('click', function closeDropdown(e) {
+            if (!dropdown.contains(e.target)) {
+                dropdown.classList.remove('active');
+                document.removeEventListener('click', closeDropdown);
+            }
+        });
+    }
+
+    // Toggle star
+    function toggleStar(filename) {
+        const starBtn = event.target;
+        starBtn.classList.toggle('starred');
+        
+        // Save to localStorage
+        const starred = JSON.parse(localStorage.getItem('starred') || '[]');
+        if (starBtn.classList.contains('starred')) {
+            if (!starred.includes(filename)) {
+                starred.push(filename);
+            }
+        } else {
+            const index = starred.indexOf(filename);
+            if (index > -1) {
+                starred.splice(index, 1);
+            }
+        }
+        localStorage.setItem('starred', JSON.stringify(starred));
+    }
+
+    // Load starred files on page load
+    window.addEventListener('DOMContentLoaded', () => {
+        const starred = JSON.parse(localStorage.getItem('starred') || '[]');
+        starred.forEach(filename => {
+            const fileCard = document.querySelector(`[data-file="${filename}"]`);
+            if (fileCard) {
+                const starBtn = fileCard.querySelector('.star-btn');
+                if (starBtn) {
+                    starBtn.classList.add('starred');
+                }
+            }
+        });
+    });
+
+    // Share file function
+    function shareFile(filename) {
+        const shareUrl = window.location.origin + '/download/' + encodeURIComponent(filename);
+        if (navigator.share) {
+            navigator.share({
+                title: 'Share File',
+                text: 'Check out this file: ' + filename,
+                url: shareUrl
+            });
+        } else {
+            navigator.clipboard.writeText(shareUrl);
+            alert('📋 Link copied to clipboard!');
+        }
+    }
 </script>
 
 {% endblock %}

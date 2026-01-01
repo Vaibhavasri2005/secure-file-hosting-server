@@ -1,24 +1,17 @@
-// Modern interactive features and animations
+// Modern interactive features
 
-// Automatically close flash messages with animation
+// Automatically close flash messages
 document.addEventListener('DOMContentLoaded', function() {
     const alerts = document.querySelectorAll('.alert');
     
     alerts.forEach(alert => {
         setTimeout(() => {
-            alert.style.transform = 'translateX(100%)';
             alert.style.opacity = '0';
             setTimeout(() => {
                 alert.remove();
             }, 300);
         }, 5000);
     });
-
-    // Add sparkle effects
-    addSparkleEffects();
-    
-    // Add floating particles
-    createFloatingParticles();
 });
 
 // File size validation
@@ -40,63 +33,30 @@ function validateFileSize(input) {
     return true;
 }
 
-// Add sparkle effects to buttons
-function addSparkleEffects() {
-    const buttons = document.querySelectorAll('.btn');
-    
-    buttons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            const sparkle = document.createElement('span');
-            sparkle.style.position = 'absolute';
-            sparkle.style.left = e.offsetX + 'px';
-            sparkle.style.top = e.offsetY + 'px';
-            sparkle.style.width = '10px';
-            sparkle.style.height = '10px';
-            sparkle.style.background = 'white';
-            sparkle.style.borderRadius = '50%';
-            sparkle.style.pointerEvents = 'none';
-            sparkle.style.animation = 'sparkle 0.6s ease-out forwards';
-            
-            button.style.position = 'relative';
-            button.appendChild(sparkle);
-            
-            setTimeout(() => sparkle.remove(), 600);
+// File management functions
+function toggleStar(filename) {
+    fetch('/star/' + filename, { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
         });
-    });
 }
 
-// Create floating particles background
-function createFloatingParticles() {
-    const container = document.querySelector('body');
-    if (!container) return;
-    
-    const particlesContainer = document.createElement('div');
-    particlesContainer.style.position = 'fixed';
-    particlesContainer.style.top = '0';
-    particlesContainer.style.left = '0';
-    particlesContainer.style.width = '100%';
-    particlesContainer.style.height = '100%';
-    particlesContainer.style.pointerEvents = 'none';
-    particlesContainer.style.zIndex = '0';
-    particlesContainer.style.overflow = 'hidden';
-    
-    // Create particles
-    for (let i = 0; i < 20; i++) {
-        const particle = document.createElement('div');
-        particle.style.position = 'absolute';
-        particle.style.width = Math.random() * 6 + 2 + 'px';
-        particle.style.height = particle.style.width;
-        particle.style.background = `rgba(${102 + Math.random() * 100}, ${126 + Math.random() * 100}, 234, ${Math.random() * 0.3})`;
-        particle.style.borderRadius = '50%';
-        particle.style.left = Math.random() * 100 + '%';
-        particle.style.top = Math.random() * 100 + '%';
-        particle.style.animation = `float ${10 + Math.random() * 20}s ease-in-out infinite`;
-        particle.style.animationDelay = Math.random() * 5 + 's';
-        
-        particlesContainer.appendChild(particle);
+// File sharing function
+function shareFile(filename) {
+    const shareUrl = window.location.origin + '/download/' + filename;
+    if (navigator.share) {
+        navigator.share({
+            title: 'Share File',
+            text: 'Check out this file: ' + filename,
+            url: shareUrl
+        });
+    } else {
+        navigator.clipboard.writeText(shareUrl);
+        alert('📋 Link copied to clipboard!');
     }
-    
-    container.insertBefore(particlesContainer, container.firstChild);
 }
 
 // Add CSS animations

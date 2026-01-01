@@ -6,35 +6,99 @@
 <div class="auth-container">
     <div class="auth-card">
         <div class="auth-header">
-            <svg class="auth-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-            </svg>
-            <h1>🎉 Welcome Back!</h1>
-            <p>Login to access your awesome cloud storage</p>
+            <div class="auth-icon-wrapper">
+                <svg class="auth-icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+            </div>
+            <h1>Welcome Back</h1>
+            <p>Sign in to your account</p>
         </div>
 
         <form method="POST" action="{{ url_for('login') }}" class="auth-form">
             <div class="form-group">
-                <label for="username">✨ Username</label>
+                <label for="username">Username</label>
                 <input type="text" id="username" name="username" required 
                        placeholder="Enter your username" autofocus>
             </div>
 
             <div class="form-group">
-                <label for="password">🔐 Password</label>
+                <label for="password">Password</label>
                 <input type="password" id="password" name="password" required 
                        placeholder="Enter your password">
             </div>
 
             <button type="submit" class="btn btn-primary btn-block">
-                🚀 Let's Go!
+                Sign In
             </button>
         </form>
 
         <div class="auth-footer">
-            <p>New here? <a href="{{ url_for('register') }}">🌟 Create an account</a></p>
+            <p>Don't have an account? <a href="{{ url_for('register') }}">Sign up</a></p>
         </div>
     </div>
 </div>
+
+<style>
+    .auth-icon-wrapper {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 56px;
+        height: 56px;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        border-radius: 12px;
+        margin: 0 auto 1.5rem;
+    }
+    
+    .auth-icon-small {
+        width: 28px;
+        height: 28px;
+        color: white;
+    }
+    
+    .auth-header h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+    
+    .auth-header p {
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+    }
+    
+    .form-group label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-group input {
+        padding: 0.875rem 1rem;
+        font-size: 0.95rem;
+        border: 1.5px solid var(--border-color);
+        transition: all 0.2s;
+    }
+    
+    .form-group input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    
+    .btn-primary {
+        padding: 0.875rem;
+        font-size: 1rem;
+        font-weight: 600;
+        margin-top: 0.5rem;
+    }
+    
+    .auth-footer {
+        margin-top: 1.5rem;
+        font-size: 0.9rem;
+    }
+</style>
 {% endblock %}
